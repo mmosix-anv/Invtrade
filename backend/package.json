@@ -2,6 +2,8 @@
   "name": "backend",
   "private": true,
   "scripts": {
+    "preinstall": "echo 'Installing backend dependencies...'",
+    "postinstall": "echo 'Backend dependencies installed successfully'",
     "dev": "nodemon",
     "clean": "node -e \"const fs=require('fs');const p=require('path');const d=p.join(__dirname,'dist');if(fs.existsSync(d)){fs.rmSync(d,{recursive:true,force:true});console.log('Cleaned dist folder')}\"",
     "build": "tsc -p tsconfig.json --noEmit false",

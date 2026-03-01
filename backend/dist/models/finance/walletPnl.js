@@ -27,11 +27,13 @@ class walletPnl extends sequelize_1.Model {
                 get() {
                     const rawData = this.getDataValue("balances");
                     // Handle both string and object formats
-                    if (!rawData) return null;
+                    if (!rawData)
+                        return null;
                     if (typeof rawData === 'string') {
                         try {
                             return JSON.parse(rawData);
-                        } catch (e) {
+                        }
+                        catch (e) {
                             return null;
                         }
                     }
