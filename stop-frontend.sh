@@ -2,7 +2,7 @@
 # Frontend stop script for Webuzo
 
 echo "Stopping frontend..."
-pkill -f "node .next/standalone/frontend/server.js"
+pkill -f "next start"
 
 if [ $? -eq 0 ]; then
     echo "Frontend stopped successfully"

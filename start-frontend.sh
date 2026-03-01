@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 # Load environment variables
 export NODE_ENV=production
-export PORT=30004
+export PORT=3000
 
 # Check if build exists
 if [ ! -d "frontend/.next" ]; then
@@ -15,7 +15,7 @@ if [ ! -d "frontend/.next" ]; then
     exit 1
 fi
 
-# Start the frontend using Next.js standalone server
+# Start the frontend using Next.js start (works without standalone)
 echo "Starting frontend on port 3000..."
 cd frontend
-node .next/standalone/frontend/server.js
+npm start
