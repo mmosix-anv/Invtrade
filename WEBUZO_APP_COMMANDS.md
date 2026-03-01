@@ -14,7 +14,7 @@ Exact commands to use in Webuzo Node.js application form.
 | **Domain** | `httptruevaultglobalbank.com` |
 | **Application Path** | `/home/httptruevault/git/Invtrade/frontend` |
 | **Node.js Version** | `20.x` |
-| **Application Port** | `3000` |
+| **Application Port** | Auto-assigned by Webuzo (e.g., 30000) |
 | **Startup File** | `server.js` |
 | **Environment** | `production` |
 
@@ -27,17 +27,23 @@ node server.js
 
 **Stop Command:**
 ```bash
-kill $(lsof -t -i:3000)
+kill $(lsof -t -i:$PORT)
+```
+
+**Note:** Webuzo automatically assigns the port (like 30000). Use that port in the stop command if `$PORT` doesn't work:
+```bash
+kill $(lsof -t -i:30000)
 ```
 
 ### Environment Variables
 
 ```
 NODE_ENV=production
-PORT=3000
 NEXT_PUBLIC_BACKEND_URL=https://api.httptruevaultglobalbank.com
 NEXT_PUBLIC_SITE_URL=https://httptruevaultglobalbank.com
 ```
+
+**Important:** Don't set `PORT` manually - Webuzo sets it automatically.
 
 ---
 
@@ -51,7 +57,7 @@ NEXT_PUBLIC_SITE_URL=https://httptruevaultglobalbank.com
 | **Domain** | `api.httptruevaultglobalbank.com` |
 | **Application Path** | `/home/httptruevault/git/Invtrade/backend` |
 | **Node.js Version** | `20.x` |
-| **Application Port** | `30004` |
+| **Application Port** | Auto-assigned by Webuzo (e.g., 30001) |
 | **Startup File** | `server.js` |
 | **Environment** | `production` |
 
@@ -64,16 +70,22 @@ node server.js
 
 **Stop Command:**
 ```bash
-kill $(lsof -t -i:30004)
+kill $(lsof -t -i:$PORT)
+```
+
+**Note:** Webuzo automatically assigns the port (like 30001). Use that port in the stop command if `$PORT` doesn't work:
+```bash
+kill $(lsof -t -i:30001)
 ```
 
 ### Environment Variables
 
 ```
 NODE_ENV=production
-NEXT_PUBLIC_BACKEND_PORT=30004
 DATABASE_URL=your_database_url_here
 ```
+
+**Important:** Don't set `NEXT_PUBLIC_BACKEND_PORT` manually - Webuzo sets `PORT` automatically.
 
 ---
 

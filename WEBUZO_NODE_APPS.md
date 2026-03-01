@@ -49,7 +49,7 @@ npm run build
 - **Domain:** `httptruevaultglobalbank.com` (or subdomain)
 - **Application Path:** `/home/httptruevault/git/Invtrade/frontend`
 - **Node.js Version:** `20.x` (or latest available)
-- **Application Port:** `3000`
+- **Application Port:** Leave empty or use Webuzo's auto-assigned port (e.g., 30000)
 - **Startup File:** `server.js`
 - **Environment:** `production`
 
@@ -60,16 +60,22 @@ node server.js
 
 **Stop Command:**
 ```bash
-kill $(lsof -t -i:3000)
+kill $(lsof -t -i:$PORT)
+```
+Or use the port Webuzo assigns (e.g., 30000):
+```bash
+kill $(lsof -t -i:30000)
 ```
 
 **Environment Variables:**
 ```
 NODE_ENV=production
-PORT=3000
+PORT=30000
 NEXT_PUBLIC_BACKEND_URL=https://api.httptruevaultglobalbank.com
 NEXT_PUBLIC_SITE_URL=https://httptruevaultglobalbank.com
 ```
+
+**Note:** Webuzo will automatically assign a port (like 30000). The `PORT` environment variable will be set by Webuzo. Just make sure `NODE_ENV=production` is set.
 
 ### Step 3: Create Startup File
 
@@ -145,7 +151,7 @@ npm run build
 - **Domain:** `api.httptruevaultglobalbank.com` (or subdomain)
 - **Application Path:** `/home/httptruevault/git/Invtrade/backend`
 - **Node.js Version:** `20.x` (or latest available)
-- **Application Port:** `30004`
+- **Application Port:** Leave empty or use Webuzo's auto-assigned port (e.g., 30001)
 - **Startup File:** `server.js`
 - **Environment:** `production`
 
@@ -156,15 +162,21 @@ node server.js
 
 **Stop Command:**
 ```bash
-kill $(lsof -t -i:30004)
+kill $(lsof -t -i:$PORT)
+```
+Or use the port Webuzo assigns (e.g., 30001):
+```bash
+kill $(lsof -t -i:30001)
 ```
 
 **Environment Variables:**
 ```
 NODE_ENV=production
-NEXT_PUBLIC_BACKEND_PORT=30004
+NEXT_PUBLIC_BACKEND_PORT=$PORT
 DATABASE_URL=your_database_url_here
 ```
+
+**Note:** Webuzo will automatically assign a port. The `PORT` environment variable will be set by Webuzo. Just make sure `NODE_ENV=production` is set.
 
 ### Step 3: Create Startup File
 
