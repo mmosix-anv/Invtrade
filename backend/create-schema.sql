@@ -1,0 +1,263 @@
+-- Supabase PostgreSQL Schema Creation Script
+-- This script creates all necessary tables for the Bicrypto application
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- User and Authentication Tables
+CREATE TABLE IF NOT EXISTS "role" (
+  "id" SERIAL PRIMARY KEY,
+  "name" VARCHAR(255) NOT NULL UNIQUE,
+  "description" TEXT,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS "permission" (
+  "id" SERIAL PRIMARY KEY,
+  "name" VARCHAR(255) NOT NULL UNIQUE,
+  "description" TEXT,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS role_permission (
+  id SERIAL PRIMARY KEY,
+  "roleId" INTEGER NOT NULL REFERENCES role(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  "permissionId" INTEGER NOT NULL REFERENCES permission(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE,
+  UNIQUE("roleId", "permissionId")
+);
+
+CREATE TABLE IF NOT EXISTS "user" (
+  "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "email" VARCHAR(255) UNIQUE,
+  "password" VARCHAR(255),
+  "avatar" VARCHAR(1000),
+  "firstName" VARCHAR(255),
+  "lastName" VARCHAR(255),
+  "emailVerified" BOOLEAN NOT NULL DEFAULT FALSE,
+  "phone" VARCHAR(255),
+  "phoneVerified" BOOLEAN NOT NULL DEFAULT FALSE,
+  "roleId" INTEGER REFERENCES "role"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "profile" JSONB,
+  "lastLogin" TIMESTAMP WITH TIME ZONE,
+  "lastFailedLogin" TIMESTAMP WITH TIME ZONE,
+  "failedLoginAttempts" INTEGER DEFAULT 0,
+  "walletAddress" VARCHAR(255),
+  "walletProvider" VARCHAR(255),
+  "status" VARCHAR(50) DEFAULT 'ACTIVE' CHECK ("status" IN ('ACTIVE', 'INACTIVE', 'SUSPENDED', 'BANNED')),
+  "settings" JSONB DEFAULT '{"email": true, "sms": true, "push": true}'::jsonb,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS "providerUser" (
+  "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "provider" VARCHAR(255) NOT NULL,
+  "providerId" VARCHAR(255) NOT NULL,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE,
+  UNIQUE("provider", "providerId")
+);
+
+CREATE TABLE IF NOT EXISTS "twoFactor" (
+  "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL UNIQUE REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "secret" VARCHAR(255) NOT NULL,
+  "enabled" BOOLEAN NOT NULL DEFAULT FALSE,
+  "type" VARCHAR(50) NOT NULL CHECK ("type" IN ('EMAIL', 'SMS', 'APP')),
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS "oneTimeToken" (
+  "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "token" VARCHAR(255) NOT NULL UNIQUE,
+  "type" VARCHAR(50) NOT NULL CHECK ("type" IN ('RESET', 'VERIFY', 'LOGIN')),
+  "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+-- Finance Tables
+CREATE TABLE IF NOT EXISTS "currency" (
+  "id" VARCHAR(191) PRIMARY KEY,
+  "name" VARCHAR(255) NOT NULL,
+  "symbol" VARCHAR(10) NOT NULL,
+  "precision" SMALLINT NOT NULL DEFAULT 2,
+  "price" DOUBLE PRECISION,
+  "status" BOOLEAN NOT NULL DEFAULT TRUE,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS "wallet" (
+  "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "type" VARCHAR(50) NOT NULL CHECK ("type" IN ('FIAT', 'SPOT', 'ECO')),
+  "currency" VARCHAR(191) NOT NULL,
+  "balance" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "inOrder" DOUBLE PRECISION DEFAULT 0,
+  "address" TEXT,
+  "network" VARCHAR(255),
+  "data" JSONB,
+  "status" BOOLEAN NOT NULL DEFAULT TRUE,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE,
+  UNIQUE("userId", "type", "currency")
+);
+
+CREATE TABLE IF NOT EXISTS "transaction" (
+  "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "walletId" UUID NOT NULL REFERENCES "wallet"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "type" VARCHAR(50) NOT NULL,
+  "status" VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+  "amount" DOUBLE PRECISION NOT NULL,
+  "fee" DOUBLE PRECISION DEFAULT 0,
+  "description" TEXT,
+  "metadata" TEXT,
+  "referenceId" VARCHAR(191) UNIQUE,
+  "trxId" VARCHAR(191),
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+-- System Tables
+CREATE TABLE IF NOT EXISTS "settings" (
+  "key" VARCHAR(255) PRIMARY KEY,
+  "value" TEXT
+);
+
+CREATE TABLE IF NOT EXISTS "notification" (
+  "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "type" VARCHAR(50) NOT NULL,
+  "title" VARCHAR(255) NOT NULL,
+  "message" TEXT NOT NULL,
+  "link" VARCHAR(255),
+  "isRead" BOOLEAN NOT NULL DEFAULT FALSE,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS "notificationTemplate" (
+  "id" SERIAL PRIMARY KEY,
+  "name" VARCHAR(255) NOT NULL UNIQUE,
+  "subject" VARCHAR(255) NOT NULL,
+  "emailBody" TEXT NOT NULL,
+  "smsBody" TEXT,
+  "pushBody" TEXT,
+  "shortCodes" JSONB,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS "extension" (
+  "id" SERIAL PRIMARY KEY,
+  "productId" VARCHAR(255) NOT NULL UNIQUE,
+  "name" VARCHAR(255) NOT NULL,
+  "title" VARCHAR(255),
+  "description" TEXT,
+  "link" VARCHAR(255),
+  "status" BOOLEAN NOT NULL DEFAULT FALSE,
+  "version" VARCHAR(50),
+  "image" VARCHAR(1000),
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS "apiKey" (
+  "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "key" VARCHAR(255) NOT NULL UNIQUE,
+  "name" VARCHAR(255) NOT NULL,
+  "permissions" JSONB,
+  "ipWhitelist" TEXT[],
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+-- Content Tables
+CREATE TABLE IF NOT EXISTS "page" (
+  "id" SERIAL PRIMARY KEY,
+  "title" VARCHAR(255) NOT NULL,
+  "slug" VARCHAR(255) NOT NULL UNIQUE,
+  "content" TEXT NOT NULL,
+  "description" TEXT,
+  "image" VARCHAR(1000),
+  "status" VARCHAR(50) NOT NULL DEFAULT 'PUBLISHED' CHECK ("status" IN ('DRAFT', 'PUBLISHED')),
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+-- Support Tables
+CREATE TABLE IF NOT EXISTS "supportTicket" (
+  "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "agentId" UUID REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE,
+  "subject" VARCHAR(255) NOT NULL,
+  "message" TEXT NOT NULL,
+  "status" VARCHAR(50) NOT NULL DEFAULT 'PENDING' CHECK ("status" IN ('PENDING', 'OPEN', 'REPLIED', 'CLOSED')),
+  "priority" VARCHAR(50) DEFAULT 'MEDIUM' CHECK ("priority" IN ('LOW', 'MEDIUM', 'HIGH', 'URGENT')),
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP WITH TIME ZONE
+);
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS "idx_user_email" ON "user"("email");
+CREATE INDEX IF NOT EXISTS "idx_user_roleId" ON "user"("roleId");
+CREATE INDEX IF NOT EXISTS "idx_wallet_userId" ON "wallet"("userId");
+CREATE INDEX IF NOT EXISTS "idx_transaction_userId" ON "transaction"("userId");
+CREATE INDEX IF NOT EXISTS "idx_transaction_walletId" ON "transaction"("walletId");
+CREATE INDEX IF NOT EXISTS "idx_notification_userId" ON "notification"("userId");
+CREATE INDEX IF NOT EXISTS "idx_supportTicket_userId" ON "supportTicket"("userId");
+
+-- Create updated_at trigger function
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW."updatedAt" = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Apply updated_at trigger to all tables
+DO $$
+DECLARE
+    t text;
+BEGIN
+    FOR t IN
+        SELECT table_name
+        FROM information_schema.columns
+        WHERE column_name = 'updatedAt'
+        AND table_schema = 'public'
+    LOOP
+        EXECUTE format('DROP TRIGGER IF EXISTS update_%I_updated_at ON %I', t, t);
+        EXECUTE format('CREATE TRIGGER update_%I_updated_at
+            BEFORE UPDATE ON %I
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column()', t, t);
+    END LOOP;
+END;
+$$ language 'plpgsql';

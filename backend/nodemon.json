@@ -1,0 +1,11 @@
+{
+  "watch": ["dist/**/*", "../.env"],
+  "ext": "js,json",
+  "exec": "node -r module-alias/register dist/index.js",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "events": {
+    "restart": "echo 'Backend restarted due to changes...'"
+  }
+}

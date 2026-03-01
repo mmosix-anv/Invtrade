@@ -1,0 +1,350 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.processFiatDeposit = processFiatDeposit;
+exports.processSpotDeposit = processSpotDeposit;
+exports.processSpotWithdrawal = processSpotWithdrawal;
+exports.refundSpotWithdrawal = refundSpotWithdrawal;
+exports.processEcoDeposit = processEcoDeposit;
+exports.processEcoWithdrawal = processEcoWithdrawal;
+exports.updateTransaction = updateTransaction;
+const db_1 = require("@b/db");
+const wallet_1 = require("@b/services/wallet");
+const error_1 = require("@b/utils/error");
+/**
+ * Process a fiat deposit using the centralized wallet service
+ * Provides atomic, audited, idempotent deposits
+ */
+async function processFiatDeposit({ userId, currency, amount, fee, referenceId, method, description, metadata, idempotencyKey, ctx, }) {
+    var _a, _b, _c;
+    (_a = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _a === void 0 ? void 0 : _a.call(ctx, "Processing fiat deposit via wallet service");
+    // Get or create wallet
+    const wallet = await wallet_1.walletCreationService.getOrCreateWallet(userId, "FIAT", currency);
+    // Use stable idempotency key for proper retry detection
+    const operationKey = idempotencyKey || `fiat_deposit_${referenceId}`;
+    const netAmount = amount - fee;
+    const result = await wallet_1.walletService.credit({
+        idempotencyKey: operationKey,
+        userId,
+        walletId: wallet.id,
+        walletType: "FIAT",
+        currency,
+        amount: netAmount,
+        operationType: "DEPOSIT",
+        fee,
+        referenceId,
+        description: description || `Deposit of ${amount} ${currency} via ${method}`,
+        metadata: {
+            method,
+            originalAmount: amount,
+            fee,
+            ...metadata,
+        },
+    });
+    // Record admin profit if fee > 0
+    if (fee > 0) {
+        (_b = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _b === void 0 ? void 0 : _b.call(ctx, "Recording admin profit");
+        await db_1.models.adminProfit.create({
+            amount: fee,
+            currency,
+            type: "DEPOSIT",
+            transactionId: result.transactionId,
+            description: `Admin profit from ${method} deposit fee of ${fee} ${currency} for user (${userId})`,
+        });
+    }
+    (_c = ctx === null || ctx === void 0 ? void 0 : ctx.success) === null || _c === void 0 ? void 0 : _c.call(ctx, `Fiat deposit completed: ${netAmount} ${currency}`);
+    return {
+        transactionId: result.transactionId,
+        walletId: result.walletId,
+        newBalance: result.newBalance,
+        amount: netAmount,
+        fee,
+        currency,
+    };
+}
+/**
+ * Process a spot deposit using the centralized wallet service
+ * Provides atomic, audited, idempotent deposits
+ */
+async function processSpotDeposit({ userId, currency, amount, fee, referenceId, chain, description, metadata, idempotencyKey, ctx, }) {
+    var _a, _b, _c;
+    (_a = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _a === void 0 ? void 0 : _a.call(ctx, "Processing spot deposit via wallet service");
+    // Get or create wallet
+    const wallet = await wallet_1.walletCreationService.getOrCreateWallet(userId, "SPOT", currency);
+    // Use stable idempotency key for proper retry detection
+    const operationKey = idempotencyKey || `spot_deposit_${referenceId}`;
+    const netAmount = amount - fee;
+    const result = await wallet_1.walletService.credit({
+        idempotencyKey: operationKey,
+        userId,
+        walletId: wallet.id,
+        walletType: "SPOT",
+        currency,
+        amount: netAmount,
+        operationType: "DEPOSIT",
+        fee,
+        referenceId,
+        description: description || `Deposit of ${amount} ${currency} via ${chain}`,
+        metadata: {
+            chain,
+            originalAmount: amount,
+            fee,
+            ...metadata,
+        },
+    });
+    // Record admin profit if fee > 0
+    if (fee > 0) {
+        (_b = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _b === void 0 ? void 0 : _b.call(ctx, "Recording admin profit");
+        await db_1.models.adminProfit.create({
+            amount: fee,
+            currency,
+            type: "DEPOSIT",
+            transactionId: result.transactionId,
+            chain,
+            description: `Admin profit from spot deposit fee of ${fee} ${currency} on ${chain} for user (${userId})`,
+        });
+    }
+    (_c = ctx === null || ctx === void 0 ? void 0 : ctx.success) === null || _c === void 0 ? void 0 : _c.call(ctx, `Spot deposit completed: ${netAmount} ${currency}`);
+    return {
+        transactionId: result.transactionId,
+        walletId: result.walletId,
+        newBalance: result.newBalance,
+        amount: netAmount,
+        fee,
+        currency,
+    };
+}
+/**
+ * Process a spot withdrawal using the centralized wallet service
+ * Provides atomic, audited, idempotent withdrawals with row-level locking
+ */
+async function processSpotWithdrawal({ userId, currency, amount, fee, toAddress, chain, memo, description, metadata, idempotencyKey, ctx, }) {
+    var _a, _b, _c, _d;
+    (_a = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _a === void 0 ? void 0 : _a.call(ctx, "Processing spot withdrawal via wallet service");
+    // Get wallet (must exist for withdrawal)
+    const wallet = await db_1.models.wallet.findOne({
+        where: { userId, currency, type: "SPOT" },
+    });
+    if (!wallet) {
+        (_b = ctx === null || ctx === void 0 ? void 0 : ctx.fail) === null || _b === void 0 ? void 0 : _b.call(ctx, `${currency} SPOT wallet not found`);
+        throw new wallet_1.WalletError("WALLET_NOT_FOUND", `${currency} wallet not found in your spot wallets`);
+    }
+    const totalDeduction = amount + fee;
+    const result = await wallet_1.walletService.debit({
+        idempotencyKey,
+        userId,
+        walletId: wallet.id,
+        walletType: "SPOT",
+        currency,
+        amount: totalDeduction,
+        operationType: "WITHDRAW",
+        fee,
+        description: description ||
+            `Withdrawal of ${amount} ${currency} to ${toAddress} via ${chain}`,
+        metadata: {
+            chain,
+            toAddress,
+            memo,
+            originalAmount: amount,
+            fee,
+            ...metadata,
+        },
+    });
+    // Record admin profit if fee > 0
+    if (fee > 0) {
+        (_c = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _c === void 0 ? void 0 : _c.call(ctx, "Recording admin profit");
+        await db_1.models.adminProfit.create({
+            amount: fee,
+            currency,
+            type: "WITHDRAW",
+            transactionId: result.transactionId,
+            chain,
+            description: `Admin profit from user (${userId}) withdrawal fee of ${fee} ${currency} on ${chain}`,
+        });
+    }
+    (_d = ctx === null || ctx === void 0 ? void 0 : ctx.success) === null || _d === void 0 ? void 0 : _d.call(ctx, `Spot withdrawal initiated: ${amount} ${currency}`);
+    return {
+        transactionId: result.transactionId,
+        walletId: result.walletId,
+        newBalance: result.newBalance,
+        amount,
+        fee,
+        currency,
+    };
+}
+/**
+ * Refund a failed withdrawal using the centralized wallet service
+ */
+async function refundSpotWithdrawal({ userId, currency, amount, fee, originalTransactionId, reason, idempotencyKey, ctx, }) {
+    var _a, _b, _c;
+    (_a = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _a === void 0 ? void 0 : _a.call(ctx, "Processing withdrawal refund via wallet service");
+    const wallet = await db_1.models.wallet.findOne({
+        where: { userId, currency, type: "SPOT" },
+    });
+    if (!wallet) {
+        (_b = ctx === null || ctx === void 0 ? void 0 : ctx.fail) === null || _b === void 0 ? void 0 : _b.call(ctx, `${currency} SPOT wallet not found for refund`);
+        throw new wallet_1.WalletError("WALLET_NOT_FOUND", `${currency} wallet not found`);
+    }
+    const refundAmount = amount + fee;
+    const result = await wallet_1.walletService.credit({
+        idempotencyKey,
+        userId,
+        walletId: wallet.id,
+        walletType: "SPOT",
+        currency,
+        amount: refundAmount,
+        operationType: "REFUND_WITHDRAWAL",
+        description: `Refund of failed withdrawal: ${reason}`,
+        metadata: {
+            originalTransactionId,
+            reason,
+            originalAmount: amount,
+            originalFee: fee,
+        },
+    });
+    (_c = ctx === null || ctx === void 0 ? void 0 : ctx.success) === null || _c === void 0 ? void 0 : _c.call(ctx, `Withdrawal refund completed: ${refundAmount} ${currency}`);
+    return {
+        transactionId: result.transactionId,
+        walletId: result.walletId,
+        newBalance: result.newBalance,
+        amount: refundAmount,
+        currency,
+    };
+}
+/**
+ * Process an ECO wallet deposit
+ */
+async function processEcoDeposit({ userId, currency, amount, fee, referenceId, chain, description, metadata, idempotencyKey, ctx, }) {
+    var _a, _b, _c;
+    (_a = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _a === void 0 ? void 0 : _a.call(ctx, "Processing ECO deposit via wallet service");
+    const wallet = await wallet_1.walletCreationService.getOrCreateWallet(userId, "ECO", currency);
+    // Use stable idempotency key for proper retry detection
+    const operationKey = idempotencyKey || `eco_deposit_${referenceId}`;
+    const netAmount = amount - fee;
+    const result = await wallet_1.walletService.credit({
+        idempotencyKey: operationKey,
+        userId,
+        walletId: wallet.id,
+        walletType: "ECO",
+        currency,
+        amount: netAmount,
+        operationType: "DEPOSIT",
+        fee,
+        referenceId,
+        description: description || `ECO Deposit of ${amount} ${currency} via ${chain}`,
+        metadata: {
+            chain,
+            originalAmount: amount,
+            fee,
+            ...metadata,
+        },
+    });
+    if (fee > 0) {
+        (_b = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _b === void 0 ? void 0 : _b.call(ctx, "Recording admin profit");
+        await db_1.models.adminProfit.create({
+            amount: fee,
+            currency,
+            type: "DEPOSIT",
+            transactionId: result.transactionId,
+            chain,
+            description: `Admin profit from ECO deposit fee of ${fee} ${currency} on ${chain} for user (${userId})`,
+        });
+    }
+    (_c = ctx === null || ctx === void 0 ? void 0 : ctx.success) === null || _c === void 0 ? void 0 : _c.call(ctx, `ECO deposit completed: ${netAmount} ${currency}`);
+    return {
+        transactionId: result.transactionId,
+        walletId: result.walletId,
+        newBalance: result.newBalance,
+        amount: netAmount,
+        fee,
+        currency,
+    };
+}
+/**
+ * Process an ECO wallet withdrawal
+ */
+async function processEcoWithdrawal({ userId, currency, amount, fee, toAddress, chain, memo, description, metadata, idempotencyKey, ctx, }) {
+    var _a, _b, _c, _d;
+    (_a = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _a === void 0 ? void 0 : _a.call(ctx, "Processing ECO withdrawal via wallet service");
+    const wallet = await db_1.models.wallet.findOne({
+        where: { userId, currency, type: "ECO" },
+    });
+    if (!wallet) {
+        (_b = ctx === null || ctx === void 0 ? void 0 : ctx.fail) === null || _b === void 0 ? void 0 : _b.call(ctx, `${currency} ECO wallet not found`);
+        throw new wallet_1.WalletError("WALLET_NOT_FOUND", `${currency} ECO wallet not found`);
+    }
+    const totalDeduction = amount + fee;
+    const result = await wallet_1.walletService.debit({
+        idempotencyKey,
+        userId,
+        walletId: wallet.id,
+        walletType: "ECO",
+        currency,
+        amount: totalDeduction,
+        operationType: "WITHDRAW",
+        fee,
+        description: description ||
+            `ECO Withdrawal of ${amount} ${currency} to ${toAddress} via ${chain}`,
+        metadata: {
+            chain,
+            toAddress,
+            memo,
+            originalAmount: amount,
+            fee,
+            ...metadata,
+        },
+    });
+    if (fee > 0) {
+        (_c = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _c === void 0 ? void 0 : _c.call(ctx, "Recording admin profit");
+        await db_1.models.adminProfit.create({
+            amount: fee,
+            currency,
+            type: "WITHDRAW",
+            transactionId: result.transactionId,
+            chain,
+            description: `Admin profit from ECO withdrawal fee of ${fee} ${currency} on ${chain} for user (${userId})`,
+        });
+    }
+    (_d = ctx === null || ctx === void 0 ? void 0 : ctx.success) === null || _d === void 0 ? void 0 : _d.call(ctx, `ECO withdrawal initiated: ${amount} ${currency}`);
+    return {
+        transactionId: result.transactionId,
+        walletId: result.walletId,
+        newBalance: result.newBalance,
+        amount,
+        fee,
+        currency,
+    };
+}
+async function updateTransaction(id, data, ctx) {
+    var _a, _b, _c, _d;
+    (_a = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _a === void 0 ? void 0 : _a.call(ctx, `Updating transaction ${id}`);
+    await db_1.models.transaction.update({
+        ...data,
+    }, {
+        where: {
+            id,
+        },
+    });
+    (_b = ctx === null || ctx === void 0 ? void 0 : ctx.step) === null || _b === void 0 ? void 0 : _b.call(ctx, `Fetching updated transaction ${id}`);
+    const updatedTransaction = await db_1.models.transaction.findByPk(id, {
+        include: [
+            {
+                model: db_1.models.wallet,
+                as: "wallet",
+                attributes: ["id", "currency"],
+            },
+            {
+                model: db_1.models.user,
+                as: "user",
+                attributes: ["id", "firstName", "lastName", "email", "avatar"],
+            },
+        ],
+    });
+    if (!updatedTransaction) {
+        (_c = ctx === null || ctx === void 0 ? void 0 : ctx.fail) === null || _c === void 0 ? void 0 : _c.call(ctx, "Transaction not found");
+        throw (0, error_1.createError)({ statusCode: 404, message: "Transaction not found" });
+    }
+    (_d = ctx === null || ctx === void 0 ? void 0 : ctx.success) === null || _d === void 0 ? void 0 : _d.call(ctx, `Transaction ${id} updated successfully`);
+    return updatedTransaction.get({
+        plain: true,
+    });
+}
