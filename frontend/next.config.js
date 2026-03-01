@@ -168,6 +168,9 @@ const siteHostname = getSiteHostname();
 const nextConfig = {
   reactStrictMode: true,
 
+  // Enable standalone output for production deployment
+  output: 'standalone',
+
   // Expose addon availability as environment variables
   // These are determined at build time based on folder existence
   env: {
