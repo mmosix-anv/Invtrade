@@ -101,7 +101,7 @@ Optional (as needed):
 
 - [ ] Build command: `npm run build:i18n && npm run build:vercel`
 - [ ] Output directory: `.next`
-- [ ] Install command: `npm install --legacy-peer-deps`
+- [ ] Install command: `npm install --legacy-peer-deps --include=dev`
 - [ ] Development command: `npm run dev`
 
 ### 3. Configure Environment Variables
@@ -376,7 +376,7 @@ After successful deployment:
 **Frontend (Vercel):**
 - Root: `frontend`
 - Build: `npm run build:i18n && npm run build:vercel`
-- Install: `npm install --legacy-peer-deps`
+- Install: `npm install --legacy-peer-deps --include=dev`
 
 **Backend (Render):**
 - Root: `backend`

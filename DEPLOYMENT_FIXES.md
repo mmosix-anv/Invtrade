@@ -31,6 +31,33 @@ This document summarizes the fixes applied to resolve deployment issues for both
 - Using Ethers v6.x (latest stable)
 - Using @tanstack/react-query v5.x (compatible with Wagmi v2)
 
+### 2. Frontend (Vercel) - Missing TypeScript
+
+**Problem:** Build failing with error:
+```
+It looks like you're trying to use TypeScript but do not have the required package(s) installed.
+Please install typescript
+```
+
+**Root Cause:** TypeScript was not in `package.json` at all. Vercel's default `npm install` doesn't install devDependencies, and TypeScript is required for Next.js builds.
+
+**Solution:** 
+1. Added TypeScript to `frontend/package.json` devDependencies:
+```json
+{
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
+```
+
+2. Updated install command to include devDependencies:
+```bash
+npm install --legacy-peer-deps --include=dev
+```
+
+The `--include=dev` flag ensures TypeScript and other build tools are installed during deployment.
+
 ### 2. Backend (Render) - Missing Type Definitions
 
 **Problem:** Build failing with TypeScript errors:
@@ -58,7 +85,7 @@ This script:
 ## Files Modified
 
 ### Frontend
-- `frontend/package.json` - Added 4 missing dependencies
+- `frontend/package.json` - Added 4 missing wallet dependencies + TypeScript
 
 ### Backend
 - `backend/package.json` - Added `build:render` script
@@ -76,7 +103,11 @@ This script:
 frontend
 
 # Install Command
-npm install --legacy-peer-deps
+npm install --legacy-peer-deps --include=dev
+
+**Flags explained:**
+- `--legacy-peer-deps`: Handles Tailwind CSS v4 peer dependency conflict
+- `--include=dev`: Installs TypeScript and build tools from devDependencies
 
 # Build Command
 npm run build:i18n && npm run build:vercel
@@ -115,6 +146,7 @@ npm run start:render
 
 ### Frontend Build Success Indicators
 - ✅ No "Module not found" errors
+- ✅ TypeScript compiles successfully
 - ✅ Wallet context compiles successfully
 - ✅ NFT utilities compile successfully
 - ✅ Build completes in 2-5 minutes
@@ -147,7 +179,7 @@ See `CRITICAL_DEPLOYMENT_ISSUE.md` for details.
 ### Test Frontend Build
 ```bash
 cd frontend
-npm install --legacy-peer-deps
+npm install --legacy-peer-deps --include=dev
 npm run build:i18n
 npm run build:vercel
 ```

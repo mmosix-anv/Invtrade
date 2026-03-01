@@ -7,11 +7,11 @@
 | **Root Directory** | `frontend` |
 | **Build Command** | `npm run build:i18n && npm run build:vercel` |
 | **Output Directory** | `.next` |
-| **Install Command** | `npm install --legacy-peer-deps` |
+| **Install Command** | `npm install --legacy-peer-deps --include=dev` |
 | **Node Version** | `20.x` |
 | **Framework** | Next.js |
 
-> **Important:** The `--legacy-peer-deps` flag is required due to Tailwind CSS v4 compatibility with `tailwind-scrollbar`.
+> **Important:** The `--legacy-peer-deps` flag is required due to Tailwind CSS v4 compatibility with `tailwind-scrollbar`. The `--include=dev` flag is required to install TypeScript and other build tools.
 
 ## Required Environment Variables
 

@@ -21,8 +21,12 @@ npm run build:i18n && npm run build:vercel
 
 ### Install Command
 ```bash
-npm install --legacy-peer-deps
+npm install --legacy-peer-deps --include=dev
 ```
+
+**Why these flags?**
+- `--legacy-peer-deps`: Required for Tailwind CSS v4 compatibility with `tailwind-scrollbar` package
+- `--include=dev`: Required to install TypeScript and other build tools from devDependencies
 
 **Note:** The frontend includes a `.npmrc` file that automatically sets `legacy-peer-deps=true`, so you can also just use `npm install`. However, Vercel requires explicit command specification.
 
@@ -44,7 +48,7 @@ When creating a new project or configuring an existing one:
 **Build & Development Settings:**
 - Build Command: `npm run build:i18n && npm run build:vercel`
 - Output Directory: `.next` (leave as default)
-- Install Command: `npm install --legacy-peer-deps`
+- Install Command: `npm install --legacy-peer-deps --include=dev`
 - Development Command: `npm run dev` (default is fine)
 
 ### 2. Why These Commands?
@@ -65,9 +69,11 @@ npm run build:i18n && npm run build:vercel
 
 Next.js outputs the production build to `.next` folder. Vercel automatically serves this.
 
-#### Install Command: `npm install --legacy-peer-deps`
+#### Install Command: `npm install --legacy-peer-deps --include=dev`
 
-Uses `--legacy-peer-deps` flag to handle peer dependency conflicts:
+Uses flags to handle dependencies:
+- `--legacy-peer-deps`: Handles peer dependency conflicts (Tailwind CSS v4 with tailwind-scrollbar)
+- `--include=dev`: Installs devDependencies (TypeScript, build tools) needed for compilation
 - `tailwind-scrollbar@3.1.0` requires Tailwind CSS v3
 - Your project uses Tailwind CSS v4
 - The flag allows installation despite version mismatch
@@ -166,10 +172,12 @@ This script uses native `NODE_OPTIONS` without requiring cross-env.
 
 **Error:** `ERESOLVE unable to resolve dependency tree` - `tailwind-scrollbar` requires Tailwind CSS v3
 
-**Solution:** Use `--legacy-peer-deps` flag in install command:
+**Solution:** Use both flags in install command:
 ```bash
-npm install --legacy-peer-deps
+npm install --legacy-peer-deps --include=dev
 ```
+
+The `--include=dev` flag ensures TypeScript and other build tools are installed.
 
 This is already configured in the Vercel settings above.
 
@@ -255,7 +263,7 @@ You can also use `vercel.json` in the frontend folder:
 {
   "buildCommand": "npm run build:i18n && npm run build:vercel",
   "outputDirectory": ".next",
-  "installCommand": "npm install --legacy-peer-deps",
+  "installCommand": "npm install --legacy-peer-deps --include=dev",
   "framework": "nextjs",
   "regions": ["iad1"],
   "env": {
@@ -296,7 +304,7 @@ vercel logs your-deployment-url --follow
 1. Root Directory: `frontend`
 2. Build Command: `npm run build:i18n && npm run build:vercel`
 3. Output Directory: `.next`
-4. Install Command: `npm install --legacy-peer-deps`
+4. Install Command: `npm install --legacy-peer-deps --include=dev`
 5. Add environment variables
 6. Deploy!
 
