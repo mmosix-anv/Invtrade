@@ -7,7 +7,7 @@ module.exports = {
     exec_mode: 'cluster',
     env: {
       NODE_ENV: 'production',
-      NEXT_PUBLIC_BACKEND_PORT: 40000,
+      NEXT_PUBLIC_BACKEND_PORT: 30004,
       
       // Database
       DATABASE_URL: 'postgres://postgres.haspwjdvxkfmsxgxofyt:IreErZa9v5i9xTpg@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require',

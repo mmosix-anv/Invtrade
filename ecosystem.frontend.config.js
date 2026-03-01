@@ -3,12 +3,12 @@ module.exports = {
     name: 'invtrade-frontend',
     cwd: './frontend',
     script: 'node_modules/next/dist/bin/next',
-    args: 'start -p 30000',
+    args: 'start -p 3000',
     instances: 1,
     exec_mode: 'cluster',
     env: {
       NODE_ENV: 'production',
-      PORT: 30000,
+      PORT: 3000,
       NEXT_PUBLIC_BACKEND_URL: 'https://api.httptruevaultglobalbank.com',
       NEXT_PUBLIC_BACKEND_WS_URL: 'api.httptruevaultglobalbank.com',
       // Add other NEXT_PUBLIC_* variables here
