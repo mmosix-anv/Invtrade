@@ -75,6 +75,9 @@ See [backend/README.md](backend/README.md)
 - [README.md](README.md) - This file, project overview
 - [DEPENDENCIES.md](DEPENDENCIES.md) - Detailed dependency structure explanation
 - [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) - Migration from Turbo monorepo
+- [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) - Complete deployment checklist
+- [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) - Frontend deployment to Vercel
+- [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md) - Backend deployment to Render
 - [frontend/README.md](frontend/README.md) - Frontend-specific documentation
 - [backend/README.md](backend/README.md) - Backend-specific documentation
 
@@ -97,15 +100,21 @@ The frontend is a Next.js application and can be deployed to:
 - Root Directory: `frontend`
 - Build Command: `npm run build:i18n && npm run build`
 - Output Directory: `.next`
-- Install Command: `npm install`
+- Install Command: `npm install --legacy-peer-deps`
 
 ### Backend
 
 The backend is a Node.js API and can be deployed to:
-- Render
+- **Render** (recommended) - See [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md) for detailed guide
 - Railway
 - Heroku
 - Any Node.js hosting platform with database support
+
+**Quick Render Setup:**
+- Root Directory: `backend`
+- Build Command: `npm install && npm run build`
+- Start Command: `npm run start:render`
+- Runtime: Node
 
 ## Migration from Turbo Monorepo
 

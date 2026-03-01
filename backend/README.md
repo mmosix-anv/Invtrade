@@ -67,3 +67,30 @@ Copy `.env.example` to `.env` and configure the required environment variables i
 ## Independent Operation
 
 This backend can now run completely independently from the frontend. It exposes REST APIs that can be consumed by any client application.
+
+## Deployment
+
+### Render (Recommended)
+
+**Quick Setup:**
+- Root Directory: `backend`
+- Build Command: `npm install && npm run build`
+- Start Command: `npm run start:render`
+- Runtime: Node
+
+**Documentation:**
+- [RENDER_SETUP_STEPS.md](RENDER_SETUP_STEPS.md) - Step-by-step visual guide
+- [DEPLOYMENT_QUICK_REFERENCE.md](DEPLOYMENT_QUICK_REFERENCE.md) - Quick reference card
+- [../RENDER_DEPLOYMENT.md](../RENDER_DEPLOYMENT.md) - Complete deployment guide
+
+### Other Platforms
+
+The backend can be deployed to any platform that supports Node.js:
+- Railway
+- Heroku
+- AWS Elastic Beanstalk
+- Google Cloud Run
+- DigitalOcean App Platform
+- Any VPS with Node.js
+
+Just ensure you run `npm run build` before starting with `npm run start:render`.

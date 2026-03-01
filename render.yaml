@@ -1,0 +1,58 @@
+# Render Infrastructure as Code
+# This file defines your Render services
+# Place in repository root
+
+services:
+  # Backend Web Service
+  - type: web
+    name: your-app-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:render
+    plan: starter  # free, starter, standard, pro
+    region: oregon  # oregon, ohio, frankfurt, singapore
+    branch: main
+    
+    # Environment variables
+    envVars:
+      - key: NODE_ENV
+        value: production
+      
+      # Database connection (linked to database below)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: your-app-db
+          property: connectionString
+      
+      - key: DIRECT_URL
+        fromDatabase:
+          name: your-app-db
+          property: connectionString
+      
+      # Add other environment variables in Render Dashboard
+      # (secrets should not be committed to git)
+    
+    # Health check
+    healthCheckPath: /api/health
+    
+    # Auto-deploy on git push
+    autoDeploy: true
+
+# Database
+databases:
+  - name: your-app-db
+    databaseName: your_app_db
+    user: your_app_user
+    plan: starter  # free, starter, standard, pro
+    region: oregon  # same as web service
+    
+    # Automatic backups (paid plans only)
+    # ipAllowList: []  # empty = allow all Render services
+
+# Redis (optional)
+# - type: redis
+#   name: your-app-redis
+#   plan: starter
+#   region: oregon
+#   maxmemoryPolicy: allkeys-lru
