@@ -2,12 +2,15 @@
 node_modules/
 .pnp
 .pnp.js
+backend/node_modules/
+frontend/node_modules/
 
 # Build outputs
 build/
 .next/
 out/
 frontend/dist/
+frontend/.next
 
 # Logs
 logs/
@@ -98,3 +101,7 @@ docs/patch-notes-data.json
 /preview
 /frontend/public/img/screenshots
 /backend/ecosystem/wallets
+
+.turbo
+.vscode
+.kiro

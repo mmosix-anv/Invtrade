@@ -329,10 +329,12 @@ const nextConfig = {
   },
   async rewrites() {
     const isDev = process.env.NODE_ENV === "development";
+    const hasRemoteBackend = !!process.env.NEXT_PUBLIC_BACKEND_URL;
 
     // In production, no rewrites needed - both frontend and backend are on the same domain
-    // In development, proxy API calls to the local backend server
-    if (!isDev) {
+    // In development with remote backend, no rewrites needed - client will use NEXT_PUBLIC_BACKEND_URL
+    // In development with local backend, proxy API calls to the local backend server
+    if (!isDev || hasRemoteBackend) {
       return [];
     }
 

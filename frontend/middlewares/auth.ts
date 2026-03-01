@@ -7,9 +7,8 @@ import { config as i18nConfig } from "@/i18n/config";
 
 const dev = process.env.NODE_ENV !== "production";
 const backendPort = process.env.NEXT_PUBLIC_BACKEND_PORT || 4000;
-const apiUrl = dev
-  ? `http://localhost:${backendPort}`
-  : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost";
+const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 
+  (dev ? `http://localhost:${backendPort}` : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost");
 
 interface Role {
   name: string;

@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
     "dev:turbo": "next dev --turbopack -H 0.0.0.0",
-    "build": "NODE_OPTIONS='--max-old-space-size=8192' next build",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 next build",
     "build:i18n": "node i18n/scripts/generate-i18n-manifest.js",
     "build:full": "npm run build:i18n && npm run build",
     "build:analyze": "cross-env ANALYZE=true npm run build",

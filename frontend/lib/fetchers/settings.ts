@@ -8,6 +8,11 @@ function getBaseURL() {
   const isDev = process.env.NODE_ENV === "development";
   const backendPort = process.env.NEXT_PUBLIC_BACKEND_PORT || 4000;
 
+  // Check for explicit backend URL first (works in both dev and prod)
+  if (process.env.NEXT_PUBLIC_BACKEND_URL) {
+    return process.env.NEXT_PUBLIC_BACKEND_URL;
+  }
+
   if (isDev) {
     return `http://localhost:${backendPort}`;
   }

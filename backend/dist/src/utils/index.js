@@ -22,7 +22,7 @@ exports.appSupport = process.env.NEXT_PUBLIC_APP_EMAIL || "support@mashdiv.com";
 // Get allowed origins from environment or use defaults
 const getDevOrigins = () => {
     const frontendPort = process.env.NEXT_PUBLIC_FRONTEND_PORT || 3000;
-    const backendPort = process.env.NEXT_PUBLIC_BACKEND_PORT || 4000;
+    const backendPort = process.env.NEXT_PUBLIC_BACKEND_PORT || 30004;
     return [
         `http://localhost:${frontendPort}`,
         `https://localhost:${frontendPort}`,

@@ -30,7 +30,7 @@ if (!envLoaded) {
 import { Worker, isMainThread, threadId } from "worker_threads";
 import { MashServer } from "./src";
 
-const port = Number(process.env.NEXT_PUBLIC_BACKEND_PORT) || 4000;
+const port = Number(process.env.NEXT_PUBLIC_BACKEND_PORT) || 30004;
 const threads = Number(process.env.NEXT_PUBLIC_BACKEND_THREADS) || 2;
 
 if (isMainThread) {

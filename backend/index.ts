@@ -29,7 +29,7 @@ import "./module-alias-setup";
 import { MashServer } from "./src";
 import { console$, logger } from "./src/utils/console";
 
-const port = process.env.NEXT_PUBLIC_BACKEND_PORT || 4000;
+const port = process.env.NEXT_PUBLIC_BACKEND_PORT || 30004;
 
 const startApp = async () => {
   try {

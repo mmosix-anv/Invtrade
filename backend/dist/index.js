@@ -28,7 +28,7 @@ if (!envLoaded) {
 require("./module-alias-setup");
 const src_1 = require("./src");
 const console_1 = require("./src/utils/console");
-const port = process.env.NEXT_PUBLIC_BACKEND_PORT || 4000;
+const port = process.env.NEXT_PUBLIC_BACKEND_PORT || 30004;
 const startApp = async () => {
     try {
         const app = new src_1.MashServer();

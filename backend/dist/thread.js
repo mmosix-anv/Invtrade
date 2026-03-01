@@ -30,7 +30,7 @@ if (!envLoaded) {
 }
 const worker_threads_1 = require("worker_threads");
 const src_1 = require("./src");
-const port = Number(process.env.NEXT_PUBLIC_BACKEND_PORT) || 4000;
+const port = Number(process.env.NEXT_PUBLIC_BACKEND_PORT) || 30004;
 const threads = Number(process.env.NEXT_PUBLIC_BACKEND_THREADS) || 2;
 if (worker_threads_1.isMainThread) {
     const acceptorApp = new src_1.MashServer();
