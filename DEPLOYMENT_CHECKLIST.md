@@ -32,7 +32,7 @@ Complete checklist for deploying frontend to Vercel and backend to Render.
 - [ ] Create new Web Service
 - [ ] Connect Git repository
 - [ ] Set root directory to `backend`
-- [ ] Set build command: `npm install && npm run build`
+- [ ] Set build command: `npm run build:render`
 - [ ] Set start command: `npm run start:render`
 - [ ] Choose instance type (Starter recommended)
 
@@ -380,7 +380,7 @@ After successful deployment:
 
 **Backend (Render):**
 - Root: `backend`
-- Build: `npm install && npm run build`
+- Build: `npm run build:render`
 - Start: `npm run start:render`
 
 **URLs:**

@@ -6,7 +6,7 @@
 |---------|-------|
 | **Service Type** | Web Service |
 | **Root Directory** | `backend` |
-| **Build Command** | `npm install && npm run build` |
+| **Build Command** | `npm run build:render` |
 | **Start Command** | `npm run start:render` |
 | **Runtime** | Node |
 | **Node Version** | 20.x |
@@ -38,7 +38,7 @@ SESSION_SECRET=your-session-secret-min-32-chars
 1. New + → Web Service
 2. Connect Git repository
 3. Set **Root Directory** to `backend`
-4. Set **Build Command** to `npm install && npm run build`
+4. Set **Build Command** to `npm run build:render`
 5. Set **Start Command** to `npm run start:render`
 6. Add environment variables
 7. Create PostgreSQL database (optional)
@@ -53,7 +53,7 @@ services:
     name: your-app-backend
     runtime: node
     rootDir: backend
-    buildCommand: npm install && npm run build
+    buildCommand: npm run build:render
     startCommand: npm run start:render
 ```
 

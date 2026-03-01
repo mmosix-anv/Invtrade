@@ -3,8 +3,22 @@
 ## Prerequisites
 
 - [ ] Git repository with backend code
+- [ ] **CRITICAL: Verify `backend/src` folder exists in repository**
 - [ ] Render account (free at [render.com](https://render.com))
 - [ ] Database ready (or will create on Render)
+
+### ⚠️ CRITICAL CHECK
+
+Before deploying, verify your source code is in the repository:
+
+```bash
+# Check if src folder exists
+ls backend/src
+
+# If it doesn't exist, see CRITICAL_DEPLOYMENT_ISSUE.md
+```
+
+If `backend/src` doesn't exist, **STOP** and read [CRITICAL_DEPLOYMENT_ISSUE.md](../CRITICAL_DEPLOYMENT_ISSUE.md) first.
 
 ## Step 1: Create Web Service
 
@@ -64,8 +78,14 @@ Node
 
 **Build Command:**
 ```bash
-npm install && npm run build
+npm install --include=dev && npm run build
 ```
+
+**Why `--include=dev`?**
+- TypeScript compilation requires `@types/node` and `@types/jest`
+- These are in devDependencies
+- Render's default `npm install` skips devDependencies in production
+- `--include=dev` ensures they're installed for the build
 
 **Start Command:**
 ```bash

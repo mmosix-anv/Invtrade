@@ -8,7 +8,7 @@ services:
     name: your-app-backend
     runtime: node
     rootDir: backend
-    buildCommand: npm install && npm run build
+    buildCommand: npm run build:render
     startCommand: npm run start:render
     plan: starter  # free, starter, standard, pro
     region: oregon  # oregon, ohio, frankfurt, singapore

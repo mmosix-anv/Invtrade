@@ -74,7 +74,7 @@ This backend can now run completely independently from the frontend. It exposes 
 
 **Quick Setup:**
 - Root Directory: `backend`
-- Build Command: `npm install && npm run build`
+- Build Command: `npm install --include=dev && npm run build`
 - Start Command: `npm run start:render`
 - Runtime: Node
 

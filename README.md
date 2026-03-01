@@ -112,7 +112,7 @@ The backend is a Node.js API and can be deployed to:
 
 **Quick Render Setup:**
 - Root Directory: `backend`
-- Build Command: `npm install && npm run build`
+- Build Command: `npm install --include=dev && npm run build`
 - Start Command: `npm run start:render`
 - Runtime: Node
 

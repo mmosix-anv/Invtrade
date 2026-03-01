@@ -16,8 +16,10 @@ backend
 
 ### Build Command
 ```bash
-npm install && npm run build
+npm run build:render
 ```
+
+**Note:** The `build:render` script automatically installs devDependencies (including TypeScript types) before building.
 
 ### Start Command
 ```bash
@@ -52,7 +54,7 @@ Node
 
 **Build Command:**
 ```bash
-npm install && npm run build
+npm run build:render
 ```
 
 **Start Command:**
@@ -211,10 +213,17 @@ Use Upstash, Redis Cloud, or any Redis provider.
 
 ## Build Process Explained
 
-### Build Command: `npm install && npm run build`
+### Build Command: `npm run build:render`
 
-1. **`npm install`** - Installs all dependencies
+The `build:render` script in `package.json` runs:
+```bash
+npm install --include=dev && tsc -p tsconfig.json --noEmit false
+```
+
+1. **`npm install --include=dev`** - Installs all dependencies including devDependencies
    - Includes native modules (sharp, argon2, bcrypt)
+   - Includes TypeScript and type definitions (@types/node, @types/jest)
+   - Required for TypeScript compilation
    - May take 2-5 minutes on first build
 
 2. **`npm run build`** - Compiles TypeScript
@@ -266,6 +275,19 @@ NEXT_PUBLIC_BACKEND_PORT=443
 ```
 
 ## Common Issues & Solutions
+
+### Issue: Build fails with "Cannot find type definition file"
+
+**Error:** `error TS2688: Cannot find type definition file for 'jest'` or `Cannot find type definition file for 'node'`
+
+**Cause:** TypeScript needs `@types/node` and `@types/jest` which are in devDependencies. Render's default `npm install` skips devDependencies in production builds.
+
+**Solution:** Use the `build:render` script which includes the `--include=dev` flag:
+```bash
+npm run build:render
+```
+
+This ensures devDependencies are installed for the TypeScript compilation.
 
 ### Issue: Build fails with "Cannot find module"
 
@@ -489,7 +511,7 @@ services:
     name: your-app-backend
     runtime: node
     rootDir: backend
-    buildCommand: npm install && npm run build
+    buildCommand: npm run build:render
     startCommand: npm run start:render
     envVars:
       - key: NODE_ENV
@@ -509,7 +531,7 @@ databases:
 
 **Quick Setup:**
 1. Root Directory: `backend`
-2. Build Command: `npm install && npm run build`
+2. Build Command: `npm run build:render`
 3. Start Command: `npm run start:render`
 4. Add environment variables
 5. Connect database
