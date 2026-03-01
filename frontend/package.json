@@ -72,6 +72,7 @@
     "d3": "^7.9.0",
     "date-fns": "^4.1.0",
     "dompurify": "^3.3.1",
+    "dotenv": "^16.4.7",
     "embla-carousel-react": "^8.6.0",
     "encoding": "^0.1.13",
     "ethers": "^6.13.5",

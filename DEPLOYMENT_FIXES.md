@@ -58,7 +58,27 @@ npm install --legacy-peer-deps --include=dev
 
 The `--include=dev` flag ensures TypeScript and other build tools are installed during deployment.
 
-### 2. Backend (Render) - Missing Type Definitions
+### 3. Frontend (Vercel/Webuzo) - Missing dotenv
+
+**Problem:** Build failing with error:
+```
+Error: Cannot find module 'dotenv'
+Require stack:
+- /home/httptruevault/git/Invtrade/frontend/next.config.js
+```
+
+**Root Cause:** The `next.config.js` file uses `require("dotenv")` to load environment variables, but `dotenv` package was not in `package.json` dependencies.
+
+**Solution:** Added `dotenv` to `frontend/package.json` dependencies:
+```json
+{
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
+```
+
+### 3. Backend (Render) - Missing Type Definitions
 
 **Problem:** Build failing with TypeScript errors:
 ```
@@ -85,7 +105,7 @@ This script:
 ## Files Modified
 
 ### Frontend
-- `frontend/package.json` - Added 4 missing wallet dependencies + TypeScript
+- `frontend/package.json` - Added 5 missing dependencies (wallet packages + TypeScript + dotenv)
 
 ### Backend
 - `backend/package.json` - Added `build:render` script
