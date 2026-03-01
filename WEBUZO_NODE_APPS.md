@@ -50,13 +50,25 @@ npm run build
 - **Application Path:** `/home/httptruevault/git/Invtrade/frontend`
 - **Node.js Version:** `20.x` (or latest available)
 - **Application Port:** `3000`
-- **Startup File:** `server.js` (we'll create this)
+- **Startup File:** `server.js`
 - **Environment:** `production`
+
+**Start Command:**
+```bash
+node server.js
+```
+
+**Stop Command:**
+```bash
+kill $(lsof -t -i:3000)
+```
 
 **Environment Variables:**
 ```
 NODE_ENV=production
 PORT=3000
+NEXT_PUBLIC_BACKEND_URL=https://api.httptruevaultglobalbank.com
+NEXT_PUBLIC_SITE_URL=https://httptruevaultglobalbank.com
 ```
 
 ### Step 3: Create Startup File
@@ -134,13 +146,24 @@ npm run build
 - **Application Path:** `/home/httptruevault/git/Invtrade/backend`
 - **Node.js Version:** `20.x` (or latest available)
 - **Application Port:** `30004`
-- **Startup File:** `server.js` (we'll create this)
+- **Startup File:** `server.js`
 - **Environment:** `production`
+
+**Start Command:**
+```bash
+node server.js
+```
+
+**Stop Command:**
+```bash
+kill $(lsof -t -i:30004)
+```
 
 **Environment Variables:**
 ```
 NODE_ENV=production
 NEXT_PUBLIC_BACKEND_PORT=30004
+DATABASE_URL=your_database_url_here
 ```
 
 ### Step 3: Create Startup File

@@ -10,7 +10,7 @@ console.log('========================================');
 console.log('Working directory:', __dirname);
 console.log('Node version:', process.version);
 console.log('Environment:', process.env.NODE_ENV || 'development');
-console.log('Port:', process.env.PORT || 3000);
+console.log('Port:', process.env.PORT || 30000);
 console.log('========================================');
 
 // Start Next.js server
@@ -20,7 +20,7 @@ const server = spawn('node', [nextBin, 'start'], {
   env: {
     ...process.env,
     NODE_ENV: 'production',
-    PORT: process.env.PORT || 3000,
+    PORT: process.env.PORT || 30000,
   },
   stdio: 'inherit'
 });
