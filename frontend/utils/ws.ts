@@ -22,7 +22,8 @@ class WebSocketManager {
 
   constructor(wsPath: string, config?: WebSocketManagerConfig) {
     const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsHost = window.location.host.replace("3000", "4000");
+    // Use NEXT_PUBLIC_BACKEND_WS_URL if available, otherwise fall back to window.location.host
+    const wsHost = process.env.NEXT_PUBLIC_BACKEND_WS_URL || window.location.host.replace("3000", "4000");
     this.url = `${wsProtocol}//${wsHost}${wsPath}`;
 
     // Set configurable parameters with defaults.

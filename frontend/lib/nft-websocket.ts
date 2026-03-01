@@ -42,7 +42,7 @@ class NFTWebSocketService {
     try {
       // Get WebSocket URL from environment or construct it
       const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const wsHost = process.env.NEXT_PUBLIC_WS_URL || window.location.host;
+      const wsHost = process.env.NEXT_PUBLIC_BACKEND_WS_URL || window.location.host;
       const wsUrl = `${wsProtocol}//${wsHost}/api/nft/ws`;
 
       this.ws = new WebSocket(wsUrl);
