@@ -7,9 +7,11 @@
 | **Root Directory** | `frontend` |
 | **Build Command** | `npm run build:i18n && npm run build` |
 | **Output Directory** | `.next` |
-| **Install Command** | `npm install` |
+| **Install Command** | `npm install --legacy-peer-deps` |
 | **Node Version** | `20.x` |
 | **Framework** | Next.js |
+
+> **Important:** The `--legacy-peer-deps` flag is required due to Tailwind CSS v4 compatibility with `tailwind-scrollbar`.
 
 ## Required Environment Variables
 
@@ -20,6 +22,10 @@ NEXT_PUBLIC_SITE_URL=https://your-app.vercel.app
 NEXT_PUBLIC_DEFAULT_LANGUAGE=en
 NEXT_PUBLIC_APP_NAME=YourAppName
 ```
+
+## Why --legacy-peer-deps?
+
+Your project uses Tailwind CSS v4, but `tailwind-scrollbar` requires v3. The `--legacy-peer-deps` flag allows npm to install despite this peer dependency conflict. The package works fine with v4.
 
 ## Deployment Steps
 
@@ -43,6 +49,7 @@ vercel
 
 | Issue | Solution |
 |-------|----------|
+| Peer dependency conflict | Install command uses `--legacy-peer-deps` |
 | Build fails | Check root directory is set to `frontend` |
 | i18n missing | Ensure build command includes `npm run build:i18n &&` |
 | API fails | Verify `NEXT_PUBLIC_BACKEND_URL` is correct |

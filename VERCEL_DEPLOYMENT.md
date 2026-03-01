@@ -21,8 +21,10 @@ npm run build:i18n && npm run build
 
 ### Install Command
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
+
+**Note:** The frontend includes a `.npmrc` file that automatically sets `legacy-peer-deps=true`, so you can also just use `npm install`. However, Vercel requires explicit command specification.
 
 ### Node Version
 ```
@@ -42,7 +44,7 @@ When creating a new project or configuring an existing one:
 **Build & Development Settings:**
 - Build Command: `npm run build:i18n && npm run build`
 - Output Directory: `.next` (leave as default)
-- Install Command: `npm install` (default is fine)
+- Install Command: `npm install --legacy-peer-deps`
 - Development Command: `npm run dev` (default is fine)
 
 ### 2. Why These Commands?
@@ -65,9 +67,13 @@ The build process requires two steps:
 
 Next.js outputs the production build to `.next` folder. Vercel automatically serves this.
 
-#### Install Command: `npm install`
+#### Install Command: `npm install --legacy-peer-deps`
 
-Standard npm install. The frontend has all its dependencies in `frontend/package.json`, so no special installation needed.
+Uses `--legacy-peer-deps` flag to handle peer dependency conflicts:
+- `tailwind-scrollbar@3.1.0` requires Tailwind CSS v3
+- Your project uses Tailwind CSS v4
+- The flag allows installation despite version mismatch
+- The package still works correctly with v4
 
 ### 3. Environment Variables
 
@@ -144,6 +150,17 @@ vercel --prod
 ```
 
 ### 6. Common Issues & Solutions
+
+#### Issue: Peer dependency conflict with tailwindcss
+
+**Error:** `ERESOLVE unable to resolve dependency tree` - `tailwind-scrollbar` requires Tailwind CSS v3
+
+**Solution:** Use `--legacy-peer-deps` flag in install command:
+```bash
+npm install --legacy-peer-deps
+```
+
+This is already configured in the Vercel settings above.
 
 #### Issue: Build fails with "Cannot find module"
 

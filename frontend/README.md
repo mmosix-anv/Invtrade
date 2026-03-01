@@ -12,8 +12,10 @@ This is the frontend application built with Next.js.
 ### Installation
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
+
+Note: Uses `--legacy-peer-deps` due to Tailwind CSS v4 compatibility. The frontend includes a `.npmrc` file that sets this automatically.
 
 ### Development
 
@@ -24,6 +26,8 @@ npm run dev
 ```
 
 The application will be available at `http://localhost:3000`
+
+Note: If you encounter peer dependency warnings during install, this is expected due to Tailwind CSS v4 compatibility with some plugins.
 
 ### Build
 
@@ -62,9 +66,12 @@ This frontend can now run completely independently from the backend. Just ensure
 - Root Directory: `frontend`
 - Build Command: `npm run build:i18n && npm run build`
 - Output Directory: `.next`
-- Install Command: `npm install`
+- Install Command: `npm install --legacy-peer-deps`
 
-See [DEPLOYMENT_QUICK_REFERENCE.md](DEPLOYMENT_QUICK_REFERENCE.md) for quick reference or [../VERCEL_DEPLOYMENT.md](../VERCEL_DEPLOYMENT.md) for complete guide.
+**Documentation:**
+- [VERCEL_SETUP_STEPS.md](VERCEL_SETUP_STEPS.md) - Step-by-step visual guide
+- [DEPLOYMENT_QUICK_REFERENCE.md](DEPLOYMENT_QUICK_REFERENCE.md) - Quick reference card
+- [../VERCEL_DEPLOYMENT.md](../VERCEL_DEPLOYMENT.md) - Complete deployment guide
 
 ### Other Platforms
 
