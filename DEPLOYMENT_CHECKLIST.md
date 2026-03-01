@@ -99,7 +99,7 @@ Optional (as needed):
 
 ### 2. Configure Build Settings
 
-- [ ] Build command: `npm run build:i18n && npm run build`
+- [ ] Build command: `npm run build:i18n && npm run build:vercel`
 - [ ] Output directory: `.next`
 - [ ] Install command: `npm install --legacy-peer-deps`
 - [ ] Development command: `npm run dev`
@@ -375,7 +375,7 @@ After successful deployment:
 
 **Frontend (Vercel):**
 - Root: `frontend`
-- Build: `npm run build:i18n && npm run build`
+- Build: `npm run build:i18n && npm run build:vercel`
 - Install: `npm install --legacy-peer-deps`
 
 **Backend (Render):**

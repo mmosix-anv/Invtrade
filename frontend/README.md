@@ -64,7 +64,7 @@ This frontend can now run completely independently from the backend. Just ensure
 
 **Quick Setup:**
 - Root Directory: `frontend`
-- Build Command: `npm run build:i18n && npm run build`
+- Build Command: `npm run build:i18n && npm run build:vercel`
 - Output Directory: `.next`
 - Install Command: `npm install --legacy-peer-deps`
 

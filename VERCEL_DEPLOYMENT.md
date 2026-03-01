@@ -11,7 +11,7 @@ frontend
 
 ### Build Command
 ```bash
-npm run build:i18n && npm run build
+npm run build:i18n && npm run build:vercel
 ```
 
 ### Output Directory
@@ -42,26 +42,24 @@ When creating a new project or configuring an existing one:
 **Root Directory:** `frontend` (IMPORTANT: Set this to frontend folder)
 
 **Build & Development Settings:**
-- Build Command: `npm run build:i18n && npm run build`
+- Build Command: `npm run build:i18n && npm run build:vercel`
 - Output Directory: `.next` (leave as default)
 - Install Command: `npm install --legacy-peer-deps`
 - Development Command: `npm run dev` (default is fine)
 
 ### 2. Why These Commands?
 
-#### Build Command: `npm run build:i18n && npm run build`
+#### Build Command
+```bash
+npm run build:i18n && npm run build:vercel
+```
 
-The build process requires two steps:
+**Why this command?**
 
-1. **`npm run build:i18n`** - Generates i18n manifest
-   - Analyzes all pages and extracts translation keys
-   - Creates optimized translation files in `public/i18n/`
-   - Required before Next.js build
+1. **`npm run build:i18n`** - Generates i18n manifest (required first)
+2. **`npm run build:vercel`** - Builds Next.js without cross-env (Vercel compatible)
 
-2. **`npm run build`** - Builds Next.js application
-   - Runs `next build` with optimizations
-   - Uses 8GB memory allocation for large builds
-   - Generates production-ready `.next` folder
+**Note:** The `build:vercel` script uses native NODE_OPTIONS instead of cross-env to avoid dependency issues.
 
 #### Output Directory: `.next`
 
@@ -151,7 +149,20 @@ vercel --prod
 
 ### 6. Common Issues & Solutions
 
-#### Issue: Peer dependency conflict with tailwindcss
+#### Issue: "cross-env: command not found"
+
+**Error:** `sh: line 1: cross-env: command not found`
+
+**Cause:** The `build` script uses `cross-env` which wasn't in frontend dependencies
+
+**Solution:** Use `build:vercel` script instead:
+```bash
+npm run build:i18n && npm run build:vercel
+```
+
+This script uses native `NODE_OPTIONS` without requiring cross-env.
+
+### Issue: Peer dependency conflict with tailwindcss
 
 **Error:** `ERESOLVE unable to resolve dependency tree` - `tailwind-scrollbar` requires Tailwind CSS v3
 
@@ -242,9 +253,9 @@ You can also use `vercel.json` in the frontend folder:
 
 ```json
 {
-  "buildCommand": "npm run build:i18n && npm run build",
+  "buildCommand": "npm run build:i18n && npm run build:vercel",
   "outputDirectory": ".next",
-  "installCommand": "npm install",
+  "installCommand": "npm install --legacy-peer-deps",
   "framework": "nextjs",
   "regions": ["iad1"],
   "env": {
@@ -283,9 +294,9 @@ vercel logs your-deployment-url --follow
 
 **Quick Setup:**
 1. Root Directory: `frontend`
-2. Build Command: `npm run build:i18n && npm run build`
+2. Build Command: `npm run build:i18n && npm run build:vercel`
 3. Output Directory: `.next`
-4. Install Command: `npm install`
+4. Install Command: `npm install --legacy-peer-deps`
 5. Add environment variables
 6. Deploy!
 

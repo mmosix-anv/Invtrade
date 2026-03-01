@@ -5,7 +5,7 @@
 | Setting | Value |
 |---------|-------|
 | **Root Directory** | `frontend` |
-| **Build Command** | `npm run build:i18n && npm run build` |
+| **Build Command** | `npm run build:i18n && npm run build:vercel` |
 | **Output Directory** | `.next` |
 | **Install Command** | `npm install --legacy-peer-deps` |
 | **Node Version** | `20.x` |
@@ -33,7 +33,7 @@ Your project uses Tailwind CSS v4, but `tailwind-scrollbar` requires v3. The `--
 
 1. Import Git repository
 2. Set **Root Directory** to `frontend`
-3. Set **Build Command** to `npm run build:i18n && npm run build`
+3. Set **Build Command** to `npm run build:i18n && npm run build:vercel`
 4. Add environment variables
 5. Deploy
 

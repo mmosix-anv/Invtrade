@@ -22,7 +22,7 @@ Click "Override" to customize build settings:
 
 #### Build Command
 ```bash
-npm run build:i18n && npm run build
+npm run build:i18n && npm run build:vercel
 ```
 
 #### Output Directory
@@ -110,12 +110,12 @@ After deployment completes:
 
 ### Error: "i18n files missing"
 
-**Cause:** Build command doesn't include i18n generation
+**Cause:** Build command doesn't include i18n generation or uses wrong script
 
 **Fix:**
 1. Go to Project Settings → General
 2. Find "Build Command"
-3. Change to: `npm run build:i18n && npm run build`
+3. Change to: `npm run build:i18n && npm run build:vercel`
 4. Redeploy
 
 ### Error: "Environment variable not defined"

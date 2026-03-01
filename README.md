@@ -98,7 +98,7 @@ The frontend is a Next.js application and can be deployed to:
 
 **Quick Vercel Setup:**
 - Root Directory: `frontend`
-- Build Command: `npm run build:i18n && npm run build`
+- Build Command: `npm run build:i18n && npm run build:vercel`
 - Output Directory: `.next`
 - Install Command: `npm install --legacy-peer-deps`
 
