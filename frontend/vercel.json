@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build:i18n && npm run build:vercel",
+  "installCommand": "npm install --legacy-peer-deps --include=dev",
+  "framework": "nextjs",
+  "outputDirectory": ".next"
+}

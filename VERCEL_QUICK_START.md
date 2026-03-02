@@ -21,6 +21,21 @@ NODE_ENV=production
 
 ### 2. Configure Vercel Project
 
+**Option A: Use vercel.json (Automatic)**
+
+Already created at `frontend/vercel.json`:
+```json
+{
+  "buildCommand": "npm run build:i18n && npm run build:vercel",
+  "installCommand": "npm install --legacy-peer-deps --include=dev",
+  "framework": "nextjs",
+  "outputDirectory": ".next"
+}
+```
+
+**Option B: Manual Configuration**
+
+In Vercel dashboard:
 ```
 Root Directory: frontend
 Build Command: npm run build:i18n && npm run build:vercel
@@ -28,6 +43,8 @@ Output Directory: .next
 Install Command: npm install --legacy-peer-deps --include=dev
 Node Version: 20.x
 ```
+
+**Important:** The `--include=dev` flag is required to install `cross-env`!
 
 ### 3. Update Backend .env
 
@@ -60,6 +77,11 @@ vercel --prod
 - [ ] No CORS errors
 
 ## Troubleshooting
+
+**Build fails: "cross-env: command not found"**
+- Ensure install command includes `--include=dev`
+- Check `frontend/vercel.json` exists
+- See `VERCEL_BUILD_FIX.md`
 
 **Images not loading?**
 - Check `NEXT_PUBLIC_BACKEND_URL` is set on Vercel

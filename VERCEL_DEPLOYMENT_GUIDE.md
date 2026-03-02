@@ -102,6 +102,8 @@ vercel
    - **Install Command:** `npm install --legacy-peer-deps --include=dev`
    - **Node Version:** 20.x
 
+**Important:** The `--include=dev` flag is critical! It installs devDependencies like `cross-env` which are needed for the build.
+
 ### Step 3: Set Environment Variables on Vercel
 
 In Vercel dashboard:
