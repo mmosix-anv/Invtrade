@@ -113,61 +113,9 @@ interface UpdateInfo {
 
 type TimeframeOption = "weekly" | "monthly" | "yearly";
 
-// Security Notice - Compact inline notice
+// Security Notice - Removed as per user request
 function SecurityNotice() {
-  const t = useTranslations("dashboard_admin");
-  const [dismissed, setDismissed] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const isDismissed = localStorage.getItem("security-notice-dismissed");
-    if (isDismissed) {
-      const dismissedTime = parseInt(isDismissed, 10);
-      if (Date.now() - dismissedTime < 30 * 24 * 60 * 60 * 1000) {
-        setDismissed(true);
-        return;
-      }
-    }
-    setDismissed(false);
-  }, []);
-
-  // Don't render anything until we know the dismissed state (prevents flash)
-  if (dismissed === null || dismissed === true) return null;
-
-  return (
-    <div
-      className="bg-gradient-to-r from-red-100/80 via-red-50/60 to-red-100/80 dark:from-red-950/40 dark:via-red-900/30 dark:to-red-950/40 border border-red-300/50 dark:border-red-500/30 rounded-lg p-4"
-    >
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
-            <ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-red-700 dark:text-red-300">
-              {t("security_reminder_we_are_exclusive_envato_authors")}
-            </p>
-            <p className="text-xs text-red-600/70 dark:text-red-400/70 mt-0.5">
-              {t("official_support_only_at")}{" "}
-              <a href="https://support.mashdiv.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-red-700 dark:hover:text-red-300">
-                {t("support_mashdiv_com")}
-              </a>
-            </p>
-          </div>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-500/10 shrink-0"
-          onClick={() => {
-            localStorage.setItem("security-notice-dismissed", Date.now().toString());
-            setDismissed(true);
-          }}
-        >
-          <XCircle className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
-  );
+  return null;
 }
 
 // Smart Insight Card - Shows contextual recommendations
