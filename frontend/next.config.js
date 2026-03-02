@@ -329,32 +329,45 @@ const nextConfig = {
   },
   async rewrites() {
     const isDev = process.env.NODE_ENV === "development";
-    const hasRemoteBackend = !!process.env.NEXT_PUBLIC_BACKEND_URL;
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-    // In production, no rewrites needed - both frontend and backend are on the same domain
-    // In development with remote backend, no rewrites needed - client will use NEXT_PUBLIC_BACKEND_URL
-    // In development with local backend, proxy API calls to the local backend server
-    if (!isDev || hasRemoteBackend) {
-      return [];
+    // If we have a remote backend URL (production or development with remote backend)
+    // Proxy uploads and logos to the backend
+    if (backendUrl) {
+      return [
+        {
+          source: "/uploads/:path*",
+          destination: `${backendUrl}/uploads/:path*`,
+        },
+        {
+          source: "/img/logo/:path*",
+          destination: `${backendUrl}/img/logo/:path*`,
+        },
+      ];
     }
 
-    // Use 127.0.0.1 for rewrites - Next.js server-side proxy always runs locally
-    const backendUrl = `http://127.0.0.1:${backendPort}`;
+    // Development with local backend - proxy everything
+    if (isDev) {
+      const localBackendUrl = `http://127.0.0.1:${backendPort}`;
+      
+      return [
+        {
+          source: "/api/:path*",
+          destination: `${localBackendUrl}/api/:path*`,
+        },
+        {
+          source: "/uploads/:path*",
+          destination: `${localBackendUrl}/uploads/:path*`,
+        },
+        {
+          source: "/img/logo/:path*",
+          destination: `${localBackendUrl}/img/logo/:path*`,
+        },
+      ];
+    }
 
-    return [
-      {
-        source: "/api/:path*",
-        destination: `${backendUrl}/api/:path*`, // Proxy to Backend (dev only)
-      },
-      {
-        source: "/uploads/:path*",
-        destination: `${backendUrl}/uploads/:path*`, // Proxy to Backend (dev only)
-      },
-      {
-        source: "/img/logo/:path*",
-        destination: `${backendUrl}/img/logo/:path*`, // Proxy to Backend (dev only)
-      },
-    ];
+    // No rewrites needed (same domain deployment)
+    return [];
   },
   images: {
     // Enable image optimization for better caching and performance
