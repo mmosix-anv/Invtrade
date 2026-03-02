@@ -33,7 +33,12 @@ class NFTWebSocketService {
 
   private createWebSocketUrl(path: string): string {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const host = window.location.host;
+    const host = process.env.NEXT_PUBLIC_BACKEND_WS_URL;
+    
+    if (!host) {
+      throw new Error('NEXT_PUBLIC_BACKEND_WS_URL is not configured. WebSocket cannot connect.');
+    }
+    
     return `${protocol}//${host}/${path}`;
   }
 

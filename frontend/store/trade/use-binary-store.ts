@@ -1817,7 +1817,15 @@ export const useBinaryStore = create<BinaryState>()(
           const { user } = useUserStore.getState();
           if (!user?.id) return;
 
-          const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || (typeof window !== 'undefined' ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname}:4000` : 'ws://localhost:4000')}/api/exchange/binary/order`;
+          const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+          const host = process.env.NEXT_PUBLIC_BACKEND_WS_URL;
+          
+          if (!host) {
+            console.error('NEXT_PUBLIC_BACKEND_WS_URL is not configured. WebSocket cannot connect.');
+            return;
+          }
+          
+          const wsUrl = `${protocol}//${host}/api/exchange/binary/order`;
 
           // Import WebSocket store dynamically to avoid circular dependencies
           import('@/store/websocket-store').then(({ useWebSocketStore }) => {

@@ -131,18 +131,23 @@ export class MarketDataWebSocketService {
   constructor() {
     // Initialize WebSocket URLs for different market types
     if (typeof window !== "undefined") {
-      const baseWsUrl =
-        process.env.NEXT_PUBLIC_WEBSOCKET_URL ||
-        `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`;
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const host = process.env.NEXT_PUBLIC_BACKEND_WS_URL;
+      
+      if (!host) {
+        throw new Error('NEXT_PUBLIC_BACKEND_WS_URL is not configured. WebSocket cannot connect.');
+      }
+      
+      const baseWsUrl = `${protocol}//${host}`;
       this.wsConnections.set("spot", `${baseWsUrl}/api/exchange/market`);
       this.wsConnections.set("eco", `${baseWsUrl}/api/ecosystem/market`);
       this.wsConnections.set("futures", `${baseWsUrl}/api/futures/market`);
     } else {
-      this.wsConnections.set("spot", "ws://localhost:3000/api/exchange/market");
-      this.wsConnections.set("eco", "ws://localhost:3000/api/ecosystem/market");
+      this.wsConnections.set("spot", "ws://localhost:4000/api/exchange/market");
+      this.wsConnections.set("eco", "ws://localhost:4000/api/ecosystem/market");
       this.wsConnections.set(
         "futures",
-        "ws://localhost:3000/api/futures/market"
+        "ws://localhost:4000/api/futures/market"
       );
     }
 

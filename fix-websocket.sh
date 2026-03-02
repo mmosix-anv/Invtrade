@@ -1,18 +1,29 @@
 #!/bin/bash
 
 echo "========================================="
-echo "WebSocket Production Fix"
+echo "WebSocket Production Fix - ALL FILES"
 echo "========================================="
 echo ""
-echo "This script will:"
-echo "1. Rebuild frontend with production URLs"
-echo "2. Restart both applications"
+echo "Fixed 6 WebSocket files:"
+echo "  1. frontend/utils/ws.ts"
+echo "  2. frontend/services/nft-ws.ts"
+echo "  3. frontend/services/tickers-ws.ts"
+echo "  4. frontend/services/orders-ws.ts"
+echo "  5. frontend/services/market-data-ws.ts"
+echo "  6. frontend/store/trade/use-binary-store.ts"
+echo ""
+echo "Changes:"
+echo "  - Removed ALL fallbacks to window.location.host"
+echo "  - Now ONLY uses NEXT_PUBLIC_BACKEND_WS_URL"
+echo "  - Will throw error if not configured"
 echo ""
 echo "Production URLs:"
 echo "  Frontend: https://inv-app.mozdev.top"
 echo "  Backend:  https://inv-api.mozdev.top"
 echo ""
-read -p "Continue? (y/n) " -n 1 -r
+echo "WebSocket will connect to: wss://inv-api.mozdev.top"
+echo ""
+read -p "Continue with rebuild? (y/n) " -n 1 -r
 echo ""
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]
@@ -33,6 +44,8 @@ npm run build
 
 if [ $? -ne 0 ]; then
     echo "❌ Frontend build failed!"
+    echo ""
+    echo "Check if NEXT_PUBLIC_BACKEND_WS_URL is set in .env"
     exit 1
 fi
 
@@ -65,6 +78,11 @@ echo "Next steps:"
 echo "1. Clear browser cache (Ctrl+Shift+Delete)"
 echo "2. Hard reload page (Ctrl+Shift+R)"
 echo "3. Check WebSocket in Network tab (F12)"
+echo "   Should connect to: wss://inv-api.mozdev.top"
 echo ""
-echo "If issues persist, see WEBSOCKET_PRODUCTION_FIX.md"
+echo "If you see 'NEXT_PUBLIC_BACKEND_WS_URL is not configured' error:"
+echo "  - Check .env file has: NEXT_PUBLIC_BACKEND_WS_URL=\"inv-api.mozdev.top\""
+echo "  - Rebuild frontend again"
+echo ""
+echo "See WEBSOCKET_ALL_FIXES.md for details"
 echo ""

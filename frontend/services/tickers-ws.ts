@@ -85,8 +85,12 @@ export class TickersWebSocketManager {
       typeof window !== "undefined" && window.location.protocol === "https:"
         ? "wss:"
         : "ws:";
-    const host =
-      typeof window !== "undefined" ? window.location.host : "localhost:3000";
+    const host = process.env.NEXT_PUBLIC_BACKEND_WS_URL;
+    
+    if (!host) {
+      throw new Error('NEXT_PUBLIC_BACKEND_WS_URL is not configured. WebSocket cannot connect.');
+    }
+    
     return `${protocol}//${host}/${path}`;
   }
 

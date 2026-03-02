@@ -22,8 +22,13 @@ class WebSocketManager {
 
   constructor(wsPath: string, config?: WebSocketManagerConfig) {
     const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    // Use NEXT_PUBLIC_BACKEND_WS_URL if available, otherwise fall back to window.location.host
-    const wsHost = process.env.NEXT_PUBLIC_BACKEND_WS_URL || window.location.host.replace("3000", "4000");
+    // MUST use NEXT_PUBLIC_BACKEND_WS_URL - no fallback to frontend domain
+    const wsHost = process.env.NEXT_PUBLIC_BACKEND_WS_URL;
+    
+    if (!wsHost) {
+      throw new Error('NEXT_PUBLIC_BACKEND_WS_URL is not configured. WebSocket cannot connect.');
+    }
+    
     this.url = `${wsProtocol}//${wsHost}${wsPath}`;
 
     // Set configurable parameters with defaults.
