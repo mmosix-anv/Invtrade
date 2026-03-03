@@ -62,10 +62,11 @@ async function fetchRowsForInterval(model, startDate, endDate, interval, aggrega
         createdAt: { [sequelize_1.Op.between]: [startDate, endDate] },
         ...additionalWhere,
     };
-    const dateFormat = interval === "hour" ? "%Y-%m-%d %H:00:00" : "%Y-%m-%d 00:00:00";
+    // PostgreSQL uses TO_CHAR instead of DATE_FORMAT
+    const dateFormat = interval === "hour" ? "YYYY-MM-DD HH24:00:00" : "YYYY-MM-DD 00:00:00";
     const attributes = [
         [
-            sequelize_1.Sequelize.fn("DATE_FORMAT", sequelize_1.Sequelize.col("createdAt"), dateFormat),
+            sequelize_1.Sequelize.fn("TO_CHAR", sequelize_1.Sequelize.col("createdAt"), dateFormat),
             "dateGroup",
         ],
         [sequelize_1.Sequelize.fn("COUNT", "*"), "total"],

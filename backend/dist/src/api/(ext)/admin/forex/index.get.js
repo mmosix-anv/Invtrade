@@ -133,7 +133,7 @@ exports.default = async (data) => {
         // 1 month: group by day for current month.
         startDate = new Date(now.getFullYear(), now.getMonth(), 1);
         endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0); // last day of month
-        groupFormat = "%d"; // day of month (01,02,...)
+        groupFormat = "DD"; // day of month (01,02,...) - PostgreSQL format
         const daysInMonth = endDate.getDate();
         intervals = Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString());
     }
@@ -141,7 +141,7 @@ exports.default = async (data) => {
         // 3 months: from 2 months before current month to end of current month, grouped weekly.
         startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
         endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        groupFormat = "%Y-%u"; // year-week number (e.g., "2023-42")
+        groupFormat = "IYYY-IW"; // ISO year-week format - PostgreSQL
         const intervalsArr = [];
         const current = new Date(startDate);
         while (current <= endDate) {
@@ -154,7 +154,7 @@ exports.default = async (data) => {
         // 1 year (default): from start to end of current year, grouped by month.
         startDate = new Date(now.getFullYear(), 0, 1);
         endDate = new Date(now.getFullYear(), 11, 31);
-        groupFormat = "%b"; // abbreviated month (Jan, Feb, etc.)
+        groupFormat = "Mon"; // abbreviated month - PostgreSQL format
         intervals = [
             "Jan",
             "Feb",
@@ -351,7 +351,7 @@ exports.default = async (data) => {
     // === CHART DATA ===
     const chartDataRaw = await db_1.models.forexInvestment.findAll({
         attributes: [
-            [(0, sequelize_1.fn)("DATE_FORMAT", (0, sequelize_1.col)("createdAt"), groupFormat), "period"],
+            [(0, sequelize_1.fn)("TO_CHAR", (0, sequelize_1.col)("createdAt"), groupFormat), "period"],
             [(0, sequelize_1.fn)("SUM", (0, sequelize_1.col)("amount")), "totalInvested"],
         ],
         where: {

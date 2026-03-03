@@ -170,7 +170,7 @@ exports.default = async (data) => {
         db_1.models.p2pOffer.findAll({
             attributes: [
                 [
-                    (0, sequelize_1.fn)("DISTINCT", (0, sequelize_1.literal)("JSON_EXTRACT(locationSettings, '$.country')")),
+                    (0, sequelize_1.fn)("DISTINCT", (0, sequelize_1.literal)("\"locationSettings\"->>'country'")),
                     "country",
                 ],
             ],

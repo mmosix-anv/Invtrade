@@ -446,8 +446,8 @@ export default function SiteHeader({
                   </motion.button>
                 )}
 
-                {/* User/Admin Toggle */}
-                {hasPermission("access.admin") && (
+                {/* User/Admin Toggle - Only show for Super Admin or users with explicit admin access */}
+                {user && (user.role?.name === "Super Admin" || hasPermission("access.admin")) && (
                   <Link href={userEquivalentPath}>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
@@ -687,8 +687,8 @@ export default function SiteHeader({
               {/* Custom Right Controls */}
               {rightControls}
 
-              {/* Admin Toggle */}
-              {hasPermission("access.admin") && (
+              {/* Admin Toggle - Only show for Super Admin or users with explicit admin access */}
+              {user && (user.role?.name === "Super Admin" || hasPermission("access.admin")) && (
                 <Link href={userEquivalentPath}>
                   <motion.button
                     whileHover={{ scale: 1.02 }}

@@ -23,10 +23,10 @@ exports.default = async (data) => {
         // Use correct table name "user"
         const [results] = await db_1.sequelize.query(`
       SELECT DISTINCT
-        JSON_UNQUOTE(JSON_EXTRACT(profile, '$.location.country')) AS country
-      FROM user
+        profile->>'location.country' AS country
+      FROM "user"
       WHERE profile IS NOT NULL
-        AND JSON_EXTRACT(profile, '$.location.country') IS NOT NULL
+        AND profile->'location'->'country' IS NOT NULL
       ORDER BY country
     `);
         ctx === null || ctx === void 0 ? void 0 : ctx.success(`Retrieved ${results.length} countries`);

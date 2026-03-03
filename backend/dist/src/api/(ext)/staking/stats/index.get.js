@@ -34,18 +34,18 @@ async function getStakingStats(req, res) {
     try {
         // 1. Total staked value (sum of all positions in active pools)
         const [totalStakedRows] = await db_1.sequelize.query(`
-      SELECT SUM(sp.\`amount\`) AS total
+      SELECT SUM(sp."amount") AS total
       FROM staking_positions AS sp
-      INNER JOIN staking_pools AS p ON sp.\`poolId\` = p.\`id\`
-      WHERE p.\`status\` = 'ACTIVE' AND sp.\`deletedAt\` IS NULL
+      INNER JOIN staking_pools AS p ON sp."poolId" = p."id"
+      WHERE p."status" = 'ACTIVE' AND sp."deletedAt" IS NULL
     `);
         const totalStaked = Number((_b = (_a = totalStakedRows[0]) === null || _a === void 0 ? void 0 : _a.total) !== null && _b !== void 0 ? _b : 0);
         // 2. Active users (unique userId in active positions)
         const [activeUsersRows] = await db_1.sequelize.query(`
-      SELECT COUNT(DISTINCT sp.\`userId\`) AS count
+      SELECT COUNT(DISTINCT sp."userId") AS count
       FROM staking_positions AS sp
-      INNER JOIN staking_pools AS p ON sp.\`poolId\` = p.\`id\`
-      WHERE p.\`status\` = 'ACTIVE' AND sp.\`deletedAt\` IS NULL
+      INNER JOIN staking_pools AS p ON sp."poolId" = p."id"
+      WHERE p."status" = 'ACTIVE' AND sp."deletedAt" IS NULL
     `);
         const activeUsers = Number((_d = (_c = activeUsersRows[0]) === null || _c === void 0 ? void 0 : _c.count) !== null && _d !== void 0 ? _d : 0);
         // 3. Average APR (weighted by current staked, only active pools)

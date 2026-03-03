@@ -284,9 +284,9 @@ async function handleExpiredOffers(ctx) {
                     [sequelize_1.Op.lt]: expiryDate,
                 },
                 [sequelize_1.Op.or]: [
-                    (0, sequelize_1.literal)(`JSON_EXTRACT(\`amountConfig\`, '$.total') = 0`),
-                    (0, sequelize_1.literal)(`JSON_EXTRACT(\`amountConfig\`, '$.total') IS NULL`),
-                    (0, sequelize_1.literal)(`CAST(JSON_EXTRACT(\`amountConfig\`, '$.total') AS DECIMAL(36,18)) <= 0`),
+                    (0, sequelize_1.literal)(`("amountConfig"->>'total')::numeric = 0`),
+                    (0, sequelize_1.literal)(`"amountConfig"->>'total' IS NULL`),
+                    (0, sequelize_1.literal)(`("amountConfig"->>'total')::numeric <= 0`),
                 ],
             },
         });

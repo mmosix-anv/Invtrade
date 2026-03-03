@@ -70,7 +70,7 @@ const formatMonth = (d) => {
  * Note: The status filter remains unchanged as [Op.in]: ["PENDING", "RELEASED"].
  */
 async function getCreatorDailyChartData(userId, start, end) {
-    const dailyFormat = "DATE_FORMAT(icoTransaction.createdAt, '%Y-%m-%d')";
+    const dailyFormat = "TO_CHAR(\"icoTransaction\".\"createdAt\", 'YYYY-MM-DD')";
     const rows = await db_1.models.icoTransaction.findAll({
         attributes: [
             [(0, sequelize_1.literal)(dailyFormat), "period"],
@@ -106,7 +106,7 @@ async function getCreatorDailyChartData(userId, start, end) {
  * Note: The status filter remains unchanged as [Op.in]: ["PENDING", "RELEASED"].
  */
 async function getCreatorMonthlyChartData(userId, start, end) {
-    const monthFormat = "DATE_FORMAT(icoTransaction.createdAt, '%Y-%m-01')";
+    const monthFormat = "TO_CHAR(\"icoTransaction\".\"createdAt\", 'YYYY-MM-01')";
     const rows = await db_1.models.icoTransaction.findAll({
         attributes: [
             [(0, sequelize_1.literal)(monthFormat), "period"],

@@ -83,14 +83,14 @@ exports.default = async (data) => {
     if (timeframe === "1m") { // Group by day for current month.
         startDate = new Date(now.getFullYear(), now.getMonth(), 1);
         endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        groupFormat = "%d"; // day (01, 02, …)
+        groupFormat = "DD"; // day (01, 02, …) - PostgreSQL format
         const daysInMonth = endDate.getDate();
         intervals = Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString());
     }
     else if (timeframe === "3m") { // Group by week (year-week format)
         startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
         endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        groupFormat = "%Y-%u";
+        groupFormat = "IYYY-IW"; // ISO year-week format - PostgreSQL
         const intervalsArr = [];
         const current = new Date(startDate);
         while (current <= endDate) {
@@ -102,7 +102,7 @@ exports.default = async (data) => {
     else { // Default 1y: group by abbreviated month
         startDate = new Date(now.getFullYear(), 0, 1);
         endDate = new Date(now.getFullYear(), 11, 31);
-        groupFormat = "%b";
+        groupFormat = "Mon"; // abbreviated month - PostgreSQL format
         intervals = [
             "Jan",
             "Feb",
@@ -137,7 +137,7 @@ exports.default = async (data) => {
     };
     // --- CHART DATA ---
     const chartDataRaw = await db_1.models.forexInvestment.findAll({ attributes: [
-            [(0, sequelize_1.fn)("DATE_FORMAT", (0, sequelize_1.col)("createdAt"), groupFormat), "period"],
+            [(0, sequelize_1.fn)("TO_CHAR", (0, sequelize_1.col)("createdAt"), groupFormat), "period"],
             [(0, sequelize_1.fn)("SUM", (0, sequelize_1.col)("amount")), "totalInvested"],
         ],
         where: { userId,

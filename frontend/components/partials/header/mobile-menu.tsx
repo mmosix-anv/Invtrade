@@ -47,7 +47,7 @@ export default function MobileMenu({
 }: MobileMenuProps) {
   const { mobileMenu, setMobileMenu } = useSidebar();
   const pathname = usePathname();
-  const { hasPermission } = useUserStore();
+  const { user, hasPermission } = useUserStore();
   const { settings } = useConfigStore();
   const t = useTranslations("common");
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
@@ -203,8 +203,8 @@ export default function MobileMenu({
               </nav>
             </div>
 
-            {/* Footer - User/Admin Toggle */}
-            {hasPermission("access.admin") && (
+            {/* Footer - User/Admin Toggle - Only show for Super Admin or users with explicit admin access */}
+            {user && (user.role?.name === "Super Admin" || hasPermission("access.admin")) && (
               <div
                 className={cn(
                   "px-4 py-3 border-t flex-shrink-0",
